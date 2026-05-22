@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muddatlar — Mahsulot Boshqaruvi</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Theme Variables ── */
+:root {
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3250;
+  --green:#22c55e;--green-bg:#052e16;--yellow:#eab308;--yellow-bg:#422006;
+  --red:#ef4444;--red-bg:#450a0a;--text:#f1f5f9;--text2:#94a3b8;
+  --accent:#6366f1;--accent2:#818cf8;--radius:14px;
+}
+body.light {
+  --bg:#f1f5f9;--surface:#ffffff;--surface2:#f8fafc;--border:#e2e8f0;
+  --green-bg:#dcfce7;--yellow-bg:#fef9c3;--red-bg:#fee2e2;
+  --text:#0f172a;--text2:#64748b;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Rubik',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s,color 0.3s;}
+
+/* ── Header ── */
+.header{background:linear-gradient(135deg,#1e1b4b,#1a1d27);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 20px rgba(0,0,0,0.4);}
+body.light .header{background:linear-gradient(135deg,#4f46e5,#6366f1);}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-avatar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;cursor:pointer;}
+.header-avatar img{width:100%;height:100%;object-fit:cover;}
+.header-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:#fff;}
+.header-title span{color:rgba(255,255,255,0.7);font-size:11px;display:block;font-weight:600;}
+.header-right{display:flex;gap:8px;align-items:center;}
+.icon-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;width:36px;height:36px;border-radius:10px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+.icon-btn:hover{background:rgba(255,255,255,0.25);}
+
+/* ── Stats Bar ── */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--border);}
+.stat-card{background:var(--surface2);border-radius:10px;padding:8px 10px;text-align:center;border:1px solid var(--border);}
+.stat-num{font-size:20px;font-weight:800;font-family:'Nunito',sans-serif;}
+.stat-label{font-size:9px;color:var(--text2);margin-top:1px;}
+.stat-card.green .stat-num{color:var(--green);}
+.stat-card.yellow .stat-num{color:var(--yellow);}
+.stat-card.red .stat-num{color:var(--red);}
+.stat-card.all .stat-num{color:var(--accent2);}
+
+/* ── Nav Tabs ── */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 14px;}
+.tab{flex:1;padding:13px 0;text-align:center;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+.tab-badge{background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:20px;min-width:16px;}
+
+/* ── Search ── */
+.search-bar{padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);}
+.search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 14px 9px 38px;color:var(--text);font-size:13px;font-family:'Rubik',sans-serif;outline:none;transition:border-color 0.2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.44 1.398a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:11px center;}
+.search-input:focus{border-color:var(--accent);}
+
+/* ── Content ── */
+.content{padding:14px 14px 80px;}
+
+/* ── VIEW: Categories Home ── */
+#view-categories .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;}
+.cat-tile{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px 14px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;position:relative;overflow:hidden;}
+.cat-tile:active{transform:scale(0.96);}
+.cat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent);}
+.cat-tile.c0::before{background:#6366f1;}
+.cat-tile.c1::before{background:#22c55e;}
+.cat-tile.c2::before{background:#eab308;}
+.cat-tile.c3::before{background:#ef4444;}
+.cat-tile.c4::before{background:#ec4899;}
+.cat-tile.c5::before{background:#14b8a6;}
+.cat-tile.c6::before{background:#f97316;}
+.cat-tile.c7::before{background:#8b5cf6;}
+.cat-icon{font-size:32px;margin-bottom:10px;}
+.cat-tile-name{font-weight:800;font-size:15px;margin-bottom:6px;}
+.cat-tile-count{font-size:12px;color:var(--text2);}
+.cat-tile-badges{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.mini-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;}
+
+/* ── VIEW: Products in Category ── */
+.back-bar{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:90;}
+.back-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rubik',sans-serif;display:flex;align-items:center;gap:5px;}
+.back-bar-title{font-weight:800;font-size:16px;}
+
+/* ── Product Card ── */
+.product-card{background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;transition:transform 0.15s;}
+.product-card:active{transform:scale(0.98);}
+.product-card.green{border-left:4px solid var(--green);}
+.product-card.yellow{border-left:4px solid var(--yellow);}
+.product-card.red{border-left:4px solid var(--red);animation:pulse-red 2s infinite;}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}50%{box-shadow:0 0 0 4px rgba(239,68,68,0.15);}}
+.card-main{display:flex;padding:12px;gap:12px;cursor:pointer;}
+.card-img{width:68px;height:68px;border-radius:10px;background:var(--surface);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;}
+.card-img img{width:100%;height:100%;object-fit:cover;}
+.card-info{flex:1;min-width:0;}
+.card-name{font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-meta{font-size:11px;color:var(--text2);margin-bottom:5px;}
+.card-badges{display:flex;gap:5px;flex-wrap:wrap;}
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;}
+.badge.green{background:var(--green-bg);color:var(--green);}
+.badge.yellow{background:var(--yellow-bg);color:var(--yellow);}
+.badge.red{background:var(--red-bg);color:var(--red);}
+.badge.gray{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
+.card-actions{border-top:1px solid var(--border);display:flex;}
+.card-btn{flex:1;padding:9px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);transition:background 0.15s;border:none;background:none;font-family:'Rubik',sans-serif;}
+.card-btn:hover{background:var(--surface);}
+.card-btn.delete{color:var(--red);}
+.card-btn.history{color:var(--accent2);}
+.card-btn+.card-btn{border-left:1px solid var(--border);}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:22px;right:18px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 24px rgba(99,102,241,0.5);border:none;transition:transform 0.15s;z-index:50;}
+.fab:active{transform:scale(0.9);}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:18px 18px 36px;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;}
+.modal-title{font-family:'Nunito',sans-serif;font-size:19px;font-weight:900;margin-bottom:16px;color:var(--accent2);}
+
+/* ── Form ── */
+.form-group{margin-bottom:13px;}
+.form-label{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.5px;}
+.form-input,.form-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:13px;font-family:'Rubik',sans-serif;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+.form-input:focus,.form-select:focus{border-color:var(--accent);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.img-upload{width:100%;height:110px;background:var(--surface2);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:6px;transition:border-color 0.2s;}
+.img-upload:hover{border-color:var(--accent);}
+.img-upload-preview{width:100%;height:110px;border-radius:10px;object-fit:cover;display:none;}
+.img-upload-icon{font-size:28px;}
+.img-upload-text{font-size:11px;color:var(--text2);}
+.btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Rubik',sans-serif;cursor:pointer;margin-top:5px;transition:opacity 0.15s;}
+.btn-submit:active{opacity:0.85;}
+.btn-cancel{width:100%;padding:11px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;font-family:'Rubik',sans-serif;cursor:pointer;margin-top:6px;}
+.qty-control{display:flex;align-items:center;gap:8px;}
+.qty-btn{width:34px;height:34px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.qty-display{min-width:44px;text-align:center;font-weight:700;}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all 0.15s;}
+.chip.selected{background:var(--accent);border-color:var(--accent);color:#fff;}
+.category-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+
+/* ── History ── */
+.history-item{padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px;border-left:3px solid var(--accent);}
+.history-item.deleted{border-left-color:var(--red);opacity:0.7;}
+.history-item-title{font-weight:700;font-size:13px;margin-bottom:3px;}
+.history-item-detail{font-size:11px;color:var(--text2);}
+.history-partition{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
+.history-partition-header{font-weight:800;font-size:13px;margin-bottom:8px;color:var(--accent2);display:flex;align-items:center;gap:6px;}
+
+/* ── Expired ── */
+.expired-card{background:var(--surface2);border-radius:var(--radius);border:1px solid var(--red);border-left:4px solid var(--red);padding:12px;margin-bottom:10px;display:flex;gap:12px;align-items:center;}
+.expired-img{width:48px;height:48px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+.expired-img img{width:100%;height:100%;object-fit:cover;}
+.expired-info{flex:1;}
+.expired-name{font-weight:700;font-size:14px;margin-bottom:2px;}
+.expired-meta{font-size:11px;color:var(--text2);}
+.expired-del{background:var(--red-bg);color:var(--red);border:1px solid var(--red);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',sans-serif;white-space:nowrap;}
+
+/* ── Settings ── */
+.settings-section{margin-bottom:20px;}
+.settings-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding:0 2px;}
+.settings-item{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;}
+.settings-item-icon{font-size:22px;width:36px;text-align:center;}
+.settings-item-info{flex:1;}
+.settings-item-label{font-weight:700;font-size:14px;}
+.settings-item-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+.settings-item-action{color:var(--text2);font-size:14px;}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform 0.2s;}
+.toggle.on::after{transform:translateX(20px);}
+
+/* ── Profile in Settings ── */
+.profile-card{background:linear-gradient(135deg,#1e1b4b,var(--surface2));border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+body.light .profile-card{background:linear-gradient(135deg,#ede9fe,var(--surface2));}
+.profile-avatar-big{width:70px;height:70px;border-radius:50%;background:var(--accent);border:3px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;cursor:pointer;flex-shrink:0;}
+.profile-avatar-big img{width:100%;height:100%;object-fit:cover;}
+.profile-info-name{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;}
+.profile-info-role{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* ── Empty ── */
+.empty-state{text-align:center;padding:50px 20px;color:var(--text2);}
+.empty-icon{font-size:56px;margin-bottom:14px;}
+.empty-title{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.empty-desc{font-size:13px;line-height:1.6;}
+
+/* ── Notification ── */
+.notification{position:fixed;top:76px;left:14px;right:14px;background:var(--yellow-bg);border:1px solid var(--yellow);border-radius:12px;padding:11px 14px;z-index:300;animation:slideDown 0.3s ease;display:none;}
+.notification.show{display:block;}
+@keyframes slideDown{from{transform:translateY(-20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.notification-title{font-weight:700;color:var(--yellow);font-size:12px;margin-bottom:3px;}
+.notification-text{font-size:11px;color:var(--text2);}
+
+/* ── Page views ── */
+.screen{display:none;}
+.screen.active{display:block;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-avatar" id="header-avatar" onclick="switchScreen('settings')">👤</div>
+    <div class="header-title">
+      📦 Muddatlar
+      <span id="header-date"></span>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+  <div class="notification-title" id="notif-title">⚠️ Ogohlantirish</div>
+  <div class="notification-text" id="notif-text"></div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-card all"><div class="stat-num" id="stat-all">0</div><div class="stat-label">Jami</div></div>
+  <div class="stat-card green"><div class="stat-num" id="stat-green">0</div><div class="stat-label">Xavfsiz</div></div>
+  <div class="stat-card yellow"><div class="stat-num" id="stat-yellow">0</div><div class="stat-label">Yaqin</div></div>
+  <div class="stat-card red"><div class="stat-num" id="stat-red">0</div><div class="stat-label">Xavfli</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(0)" id="tab0">📦 Mahsulotlar</div>
+  <div class="tab" onclick="switchTab(1)" id="tab1">⚠️ Tugagan <span class="tab-badge" id="expired-badge" style="display:none">0</span></div>
+  <div class="tab" onclick="switchTab(2)" id="tab2">⚙️ Sozlamalar</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 0: MAHSULOTLAR
+══════════════════════════════════════════ -->
+<div class="screen active" id="tab-screen-0">
+
+  <!-- Search (shown in product list) -->
+  <div class="search-bar" id="search-area">
+    <input class="search-input" type="text" id="search-input" placeholder="Mahsulot qidirish..." oninput="onSearch()">
+  </div>
+
+  <!-- View A: Category Tiles -->
+  <div id="view-categories">
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+
+  <!-- View B: Products in selected category -->
+  <div id="view-products" style="display:none;">
+    <div class="back-bar">
+      <button class="back-btn" onclick="backToCategories()">← Orqaga</button>
+      <div class="back-bar-title" id="view-cat-title"></div>
+    </div>
+    <div class="content" id="products-content"></div>
+  </div>
+
+  <!-- View C: Search results -->
+  <div id="view-search" style="display:none;">
+    <div class="content" id="search-results"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 1: MUDDATI TUGAGAN
+══════════════════════════════════════════ -->
+<div class="screen" id="tab-screen-1">
+  <div class="content" id="expired-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 2: SOZLAMALAR
+══════════════════════════════════════════ -->
+<div class="screen" id="tab-screen-2">
+  <div class="content">
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-avatar-big" id="settings-avatar" onclick="document.getElementById('avatar-file').click()">👤</div>
+      <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="handleAvatar(event)">
+      <div>
+        <div class="profile-info-name" id="profile-name-display">Foydalanuvchi</div>
+        <div class="profile-info-role" id="profile-role-display">Do'kon xodimi</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="profile-date-display"></div>
+      </div>
+    </div>
+
+    <!-- Shaxsiy ma'lumotlar -->
+    <div class="settings-section">
+      <div class="settings-title">👤 Shaxsiy ma'lumotlar</div>
+      <div class="form-group">
+        <label class="form-label">Ism</label>
+        <input class="form-input" type="text" id="s-firstname" placeholder="Ismingiz" oninput="saveProfile()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Familiya</label>
+        <input class="form-input" type="text" id="s-lastname" placeholder="Familiyangiz" oninput="saveProfile()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Do'kon nomi</label>
+        <input class="form-input" type="text" id="s-shopname" placeholder="Do'kon nomi" oninput="saveProfile()">
+      </div>
+    </div>
+
+    <!-- Ko'rinish -->
+    <div class="settings-section">
+      <div class="settings-title">🎨 Ko'rinish</div>
+      <div class="settings-item" onclick="toggleTheme()">
+        <div class="settings-item-icon">🌙</div>
+        <div class="settings-item-info">
+          <div class="settings-item-label">Qorong'u rejim</div>
+          <div class="settings-item-desc">Tungi ko'rinish</div>
+        </div>
+        <div class="toggle" id="theme-toggle"></div>
+      </div>
+    </div>
+
+    <!-- Toifalar -->
+    <div class="settings-section">
+      <div class="settings-title">🏷️ Toifalar</div>
+      <div id="cat-manage-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input class="form-input" type="text" id="new-cat-input" placeholder="Yangi toifa nomi..." style="flex:1;">
+        <button class="btn-submit" style="width:auto;padding:10px 16px;margin:0;" onclick="addNewCategory()">➕</button>
+      </div>
+    </div>
+
+    <!-- Eksport -->
+    <div class="settings-section">
+      <div class="settings-title">📤 Ma'lumotlar</div>
+      <div class="settings-item" onclick="exportData()">
+        <div class="settings-item-icon">📊</div>
+        <div class="settings-item-info">
+          <div class="settings-item-label">JSON eksport</div>
+          <div class="settings-item-desc">Barcha ma'lumotlarni saqlash</div>
+        </div>
+        <div class="settings-item-action">→</div>
+      </div>
+      <div class="settings-item" onclick="clearAllData()">
+        <div class="settings-item-icon">🗑️</div>
+        <div class="settings-item-info">
+          <div class="settings-item-label">Barcha ma'lumotlarni tozalash</div>
+          <div class="settings-item-desc" style="color:var(--red);">Qaytarib bo'lmaydi!</div>
+        </div>
+        <div class="settings-item-action">→</div>
+      </div>
+    </div>
+
+    <!-- Biz haqimizda -->
+    <div class="settings-section">
+      <div class="settings-title">ℹ️ Biz haqimizda</div>
+      <div style="background:linear-gradient(135deg,#1e1b4b,var(--surface2));border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:8px;">
+        <!-- Banner -->
+        <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:20px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:8px;">📦</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff;">Muddatlar</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;">Mahsulot muddatlarini boshqarish tizimi</div>
+          <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;font-size:11px;color:#fff;margin-top:8px;font-weight:700;">v1.0</div>
+        </div>
+        <!-- Info -->
+        <div style="padding:16px;display:grid;gap:10px;">
+          <div style="background:var(--bg);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👨‍💻</div>
+            <div>
+              <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Yaratuvchi</div>
+              <div style="font-weight:800;font-size:15px;">Odilov Asadbek</div>
+            </div>
+          </div>
+
+          <a href="tel:+998331741433" style="text-decoration:none;">
+            <div style="background:var(--bg);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:40px;height:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📞</div>
+              <div>
+                <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Telefon</div>
+                <div style="font-weight:700;font-size:14px;color:var(--text);">+998 33 174 14 33</div>
+              </div>
+              <div style="margin-left:auto;color:var(--green);font-size:14px;">→</div>
+            </div>
+          </a>
+
+          <a href="https://t.me/od1lov_mee" target="_blank" style="text-decoration:none;">
+            <div style="background:var(--bg);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:40px;height:40px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✈️</div>
+              <div>
+                <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Telegram</div>
+                <div style="font-weight:700;font-size:14px;color:var(--text);">@od1lov_mee</div>
+              </div>
+              <div style="margin-left:auto;color:#0ea5e9;font-size:14px;">→</div>
+            </div>
+          </a>
+
+          <a href="https://instagram.com/od1lov_me" target="_blank" style="text-decoration:none;">
+            <div style="background:var(--bg);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:40px;height:40px;background:linear-gradient(135deg,#ec4899,#be185d);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📸</div>
+              <div>
+                <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Instagram</div>
+                <div style="font-weight:700;font-size:14px;color:var(--text);">@od1lov_me</div>
+              </div>
+              <div style="margin-left:auto;color:#ec4899;font-size:14px;">→</div>
+            </div>
+          </a>
+
+          <div style="background:var(--bg);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📍</div>
+            <div>
+              <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Manzil</div>
+              <div style="font-weight:700;font-size:14px;">Andijon shahar</div>
+              <div style="font-size:12px;color:var(--text2);">1-kichik daxa</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App info -->
+    <div style="text-align:center;padding:16px;color:var(--text2);font-size:11px;">
+      Muddatlar v1.0 · Odilov Asadbek tomonidan yaratildi 🌸
+    </div>
+
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab-btn" onclick="openAddModal()">＋</button>
+
+<!-- ══════ MODALS ══════ -->
+
+<!-- Add Product Modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">➕ Mahsulot qo'shish</div>
+    <div class="form-group">
+      <label class="form-label">Rasm</label>
+      <img id="img-preview" class="img-upload-preview" src="" alt="">
+      <div class="img-upload" id="img-upload-area" onclick="document.getElementById('img-file').click()">
+        <div class="img-upload-icon">📷</div>
+        <div class="img-upload-text">Kamera yoki galereya</div>
+      </div>
+      <input type="file" id="img-file" accept="image/*" capture="environment" style="display:none" onchange="handleImage(event)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mahsulot nomi</label>
+      <input class="form-input" type="text" id="f-name" placeholder="Masalan: Yogurt">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Toifa</label>
+      <div class="category-chips" id="category-chips"></div>
+      <input class="form-input" type="text" id="f-new-cat" placeholder="Yangi toifa (Enter bosing)..." style="margin-top:6px;" onkeydown="addCategoryOnEnter(event)">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ishlab chiqarilgan</label>
+        <input class="form-input" type="date" id="f-made">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tugash sanasi</label>
+        <input class="form-input" type="date" id="f-expire">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Miqdori</label>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-display" id="qty-display">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+        <input class="form-input" type="text" id="f-qty-unit" placeholder="dona / kg / litr..." style="flex:1;">
+      </div>
+    </div>
+    <button class="btn-submit" onclick="addProduct()">✅ Saqlash</button>
+    <button class="btn-cancel" onclick="closeModal('add-modal')">Bekor qilish</button>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal-overlay" id="history-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="history-modal-title">📜 Mahsulot tarixi</div>
+    <div id="history-content"></div>
+    <button class="btn-cancel" onclick="closeModal('history-modal')">Yopish</button>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="detail-content"></div>
+    <button class="btn-cancel" onclick="closeModal('detail-modal')">Yopish</button>
+  </div>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────
+let products    = JSON.parse(localStorage.getItem('m_products') || '[]');
+let categories  = JSON.parse(localStorage.getItem('m_cats') || '["Oziq-ovqat","Ichimliklar","Kosmetika","Dori-darmon","Boshqa"]');
+let gHistory    = JSON.parse(localStorage.getItem('m_history') || '[]');
+let profile     = JSON.parse(localStorage.getItem('m_profile') || '{"firstname":"","lastname":"","shopname":"","avatar":""}');
+let isDark      = localStorage.getItem('m_theme') !== 'light';
+let currentQty  = 1;
+let currentImg  = '';
+let selCat      = '';
+let activeCat   = '';
+
+// ── Save ──────────────────────────────────────────
+function save() {
+  localStorage.setItem('m_products', JSON.stringify(products));
+  localStorage.setItem('m_cats', JSON.stringify(categories));
+  localStorage.setItem('m_history', JSON.stringify(gHistory));
+  localStorage.setItem('m_profile', JSON.stringify(profile));
+}
+
+// ── Helpers ───────────────────────────────────────
+function daysLeft(d) {
+  const t=new Date(); t.setHours(0,0,0,0);
+  const e=new Date(d); e.setHours(0,0,0,0);
+  return Math.ceil((e-t)/86400000);
+}
+function statusClass(days) {
+  if(days<0)return 'expired';
+  if(days<=4)return 'red';
+  if(days===5)return 'yellow';
+  return 'green';
+}
+function formatDate(d) {
+  if(!d)return '—';
+  return new Date(d).toLocaleDateString('uz-UZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function nowStr(){return new Date().toISOString();}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function catColors(){return['#6366f1','#22c55e','#eab308','#ef4444','#ec4899','#14b8a6','#f97316','#8b5cf6'];}
+function catIcons(){return['🥩','🥤','💄','💊','📦','🧹','🍞','🐟','🥛','🧴','🫙','🍎'];}
+
+// ── Theme ─────────────────────────────────────────
+function applyTheme() {
+  document.body.classList.toggle('light',!isDark);
+  document.getElementById('theme-btn').textContent=isDark?'🌙':'☀️';
+  const tog=document.getElementById('theme-toggle');
+  if(tog)tog.classList.toggle('on',isDark);
+  localStorage.setItem('m_theme',isDark?'dark':'light');
+}
+function toggleTheme(){isDark=!isDark;applyTheme();}
+
+// ── Date ─────────────────────────────────────────
+(function(){
+  const d=new Date();
+  document.getElementById('header-date').textContent=
+    d.toLocaleDateString('uz-UZ',{weekday:'short',day:'numeric',month:'long'});
+  document.getElementById('profile-date-display').textContent=
+    '📅 Bugun: '+d.toLocaleDateString('uz-UZ',{day:'numeric',month:'long',year:'numeric'});
+})();
+
+// ── Tab switch ────────────────────────────────────
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.screen').forEach((s,j)=>s.classList.toggle('active',i===j));
+  const fab=document.getElementById('fab-btn');
+  fab.style.display=(i===0)?'flex':'none';
+  if(i===1)renderExpired();
+  if(i===2)renderSettings();
+}
+function switchScreen(s){
+  if(s==='settings')switchTab(2);
+}
+
+// ── Tab 0: Category/Product navigation ───────────
+function renderCategoryTiles() {
+  const grid=document.getElementById('cat-grid');
+  const colors=catColors();
+  const icons=catIcons();
+  // count per cat
+  const counts={};
+  const statCount={green:{},yellow:{},red:{}};
+  products.forEach(p=>{
+    p.batches.filter(b=>!b.deletedAt).forEach(b=>{
+      const d=daysLeft(b.expire);
+      if(d<0)return;
+      counts[p.category]=(counts[p.category]||0)+1;
+      const sc=statusClass(d);
+      if(!statCount[sc][p.category])statCount[sc][p.category]=0;
+      statCount[sc][p.category]++;
+    });
+  });
+  if(!categories.length){
+    grid.innerHTML='<div style="grid-column:span 2;text-align:center;padding:40px;color:var(--text2);">Toifa yo\'q. Sozlamalardan qo\'shing.</div>';
+    return;
+  }
+  grid.innerHTML=categories.map((c,i)=>{
+    const total=counts[c]||0;
+    const g=statCount.green[c]||0;
+    const y=statCount.yellow[c]||0;
+    const r=statCount.red[c]||0;
+    const ic=icons[i%icons.length];
+    return `
+    <div class="cat-tile c${i%8}" onclick="openCategory('${c}')">
+      <div class="cat-icon">${ic}</div>
+      <div class="cat-tile-name">${c}</div>
+      <div class="cat-tile-count">${total} ta partiya</div>
+      <div class="cat-tile-badges">
+        ${g?`<span class="mini-badge" style="background:var(--green-bg);color:var(--green)">🟢${g}</span>`:''}
+        ${y?`<span class="mini-badge" style="background:var(--yellow-bg);color:var(--yellow)">🟡${y}</span>`:''}
+        ${r?`<span class="mini-badge" style="background:var(--red-bg);color:var(--red)">🔴${r}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCategory(cat) {
+  activeCat=cat;
+  document.getElementById('view-cat-title').textContent=cat;
+  document.getElementById('view-categories').style.display='none';
+  document.getElementById('view-products').style.display='block';
+  document.getElementById('view-search').style.display='none';
+  renderProductsInCat(cat);
+}
+
+function backToCategories() {
+  activeCat='';
+  document.getElementById('view-categories').style.display='block';
+  document.getElementById('view-products').style.display='none';
+  document.getElementById('view-search').style.display='none';
+  document.getElementById('search-input').value='';
+  renderCategoryTiles();
+}
+
+function onSearch() {
+  const q=document.getElementById('search-input').value.trim().toLowerCase();
+  if(!q) {
+    document.getElementById('view-search').style.display='none';
+    if(activeCat){
+      document.getElementById('view-products').style.display='block';
+    } else {
+      document.getElementById('view-categories').style.display='block';
+    }
+    return;
+  }
+  document.getElementById('view-categories').style.display='none';
+  document.getElementById('view-products').style.display='none';
+  document.getElementById('view-search').style.display='block';
+  // search all
+  const res=[];
+  products.forEach(p=>{
+    if(!p.name.toLowerCase().includes(q))return;
+    p.batches.filter(b=>!b.deletedAt&&daysLeft(b.expire)>=0).forEach(b=>res.push({p,b}));
+  });
+  const cont=document.getElementById('search-results');
+  if(!res.length){cont.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Topilmadi</div></div>';return;}
+  cont.innerHTML=res.map(({p,b})=>productCardHTML(p,b)).join('');
+}
+
+function renderProductsInCat(cat) {
+  const cont=document.getElementById('products-content');
+  const items=[];
+  products.forEach(p=>{
+    if(p.category!==cat)return;
+    p.batches.filter(b=>!b.deletedAt&&daysLeft(b.expire)>=0).forEach(b=>items.push({p,b}));
+  });
+  if(!items.length){
+    cont.innerHTML='<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">Bu toifada mahsulot yo\'q</div><div class="empty-desc">+ tugmasini bosib qo\'shing</div></div>';
+    return;
+  }
+  cont.innerHTML=items.map(({p,b})=>productCardHTML(p,b)).join('');
+}
+
+function productCardHTML(p,b) {
+  const days=daysLeft(b.expire);
+  const sc=statusClass(days);
+  const badgeText=days===0?'Bugun tugaydi!':days===1?'1 kun qoldi!':`${days} kun qoldi`;
+  const imgHtml=b.img
+    ?`<div class="card-img"><img src="${b.img}" alt=""></div>`
+    :`<div class="card-img">📦</div>`;
+  return `
+  <div class="product-card ${sc}">
+    <div class="card-main" onclick="openDetail('${p.id}','${b.id}')">
+      ${imgHtml}
+      <div class="card-info">
+        <div class="card-name">${p.name}</div>
+        <div class="card-meta">📅 ${formatDate(b.made)} → ${formatDate(b.expire)}</div>
+        <div class="card-badges">
+          <span class="badge ${sc}">${badgeText}</span>
+          <span class="badge gray">📦 ${b.qty} ${b.unit}</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button class="card-btn history" onclick="openHistory('${p.id}')">📜 Tarix</button>
+      <button class="card-btn" onclick="openQtyModal('${p.id}','${b.id}')">➖ Sotish</button>
+      <button class="card-btn delete" onclick="deleteBatch('${p.id}','${b.id}')">🗑️ O'chirish</button>
+    </div>
+  </div>`;
+}
+
+// ── Add Product ───────────────────────────────────
+function openAddModal() {
+  document.getElementById('f-name').value='';
+  document.getElementById('f-made').value='';
+  document.getElementById('f-expire').value='';
+  document.getElementById('f-qty-unit').value='dona';
+  document.getElementById('f-new-cat').value='';
+  document.getElementById('img-preview').style.display='none';
+  document.getElementById('img-upload-area').style.display='flex';
+  currentQty=1; currentImg='';
+  selCat=activeCat||'';
+  document.getElementById('qty-display').textContent='1';
+  renderAddChips();
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function renderAddChips() {
+  document.getElementById('category-chips').innerHTML=
+    categories.map(c=>`<div class="chip${selCat===c?' selected':''}" onclick="selCat='${c}';renderAddChips()">${c}</div>`).join('');
+}
+
+function addCategoryOnEnter(e) {
+  if(e.key!=='Enter')return;
+  const v=document.getElementById('f-new-cat').value.trim();
+  if(v&&!categories.includes(v)){categories.push(v);save();}
+  if(v)selCat=v;
+  document.getElementById('f-new-cat').value='';
+  renderAddChips();
+}
+
+function handleImage(e) {
+  const file=e.target.files[0];
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    currentImg=ev.target.result;
+    const prev=document.getElementById('img-preview');
+    prev.src=currentImg; prev.style.display='block';
+    document.getElementById('img-upload-area').style.display='none';
+  };
+  r.readAsDataURL(file);
+}
+
+function changeQty(d){currentQty=Math.max(1,currentQty+d);document.getElementById('qty-display').textContent=currentQty;}
+
+function addProduct() {
+  const name=document.getElementById('f-name').value.trim();
+  const made=document.getElementById('f-made').value;
+  const expire=document.getElementById('f-expire').value;
+  const unit=document.getElementById('f-qty-unit').value.trim()||'dona';
+  const cat=selCat||categories[0]||'Boshqa';
+  if(!name||!expire){alert('Iltimos, nom va tugash sanasini kiriting!');return;}
+
+  const existing=products.find(p=>p.name===name&&p.category===cat);
+  const batchNum=existing?(existing.batches.length+1):1;
+
+  const batch={id:uid(),qty:currentQty,unit,made,expire,img:currentImg,addedAt:nowStr(),deletedAt:null};
+
+  if(existing){existing.batches.push(batch);}
+  else{products.push({id:uid(),name,category:cat,batches:[batch]});}
+
+  gHistory.push({
+    productName:name,category:cat,batchNum,
+    action:`${batchNum}-partiya kiritildi`,
+    qty:currentQty,unit,expire,
+    addedBy:getFullName(),
+    time:nowStr()
+  });
+
+  save();
+  closeModal('add-modal');
+  // refresh current view
+  if(activeCat===cat||activeCat==='')renderCategoryTiles();
+  if(activeCat===cat)renderProductsInCat(cat);
+  updateStats();
+  checkNotifications();
+}
+
+// ── Delete ────────────────────────────────────────
+function deleteBatch(pid,bid) {
+  const p=products.find(x=>x.id===pid);
+  if(!p)return;
+  const b=p.batches.find(x=>x.id===bid);
+  if(!b)return;
+  if(!confirm(`"${p.name}" partiyasini o'chirasizmi?`))return;
+  b.deletedAt=nowStr();
+  gHistory.push({
+    productName:p.name,category:p.category,
+    action:`Partiya o'chirildi`,
+    qty:b.qty,unit:b.unit,expire:b.expire,
+    addedBy:getFullName(),
+    time:nowStr()
+  });
+  save();
+  if(activeCat)renderProductsInCat(activeCat);
+  else renderCategoryTiles();
+  updateStats();
+}
+
+// ── Qty reduce ────────────────────────────────────
+function openQtyModal(pid,bid) {
+  const p=products.find(x=>x.id===pid);
+  if(!p)return;
+  const b=p.batches.find(x=>x.id===bid);
+  if(!b)return;
+  const amount=prompt(`Nechta sotildi? (Joriy: ${b.qty} ${b.unit})`);
+  if(!amount||isNaN(amount)||+amount<=0)return;
+  const sold=Math.min(+amount,b.qty);
+  b.qty-=sold;
+  gHistory.push({
+    productName:p.name,category:p.category,
+    action:`${sold} ${b.unit} sotildi`,
+    qty:sold,unit:b.unit,expire:b.expire,
+    addedBy:getFullName(),
+    time:nowStr()
+  });
+  if(b.qty===0){
+    b.deletedAt=nowStr();
+    gHistory.push({productName:p.name,category:p.category,action:'Partiya tugadi (0 qoldi)',qty:0,unit:b.unit,expire:b.expire,addedBy:getFullName(),time:nowStr()});
+  }
+  save();
+  if(activeCat)renderProductsInCat(activeCat);
+  else renderCategoryTiles();
+  updateStats();
+}
+
+// ── History ───────────────────────────────────────
+function openHistory(pid) {
+  const p=products.find(x=>x.id===pid);
+  if(!p)return;
+  document.getElementById('history-modal-title').textContent=`📜 ${p.name} — Barcha partiyalar tarixi`;
+
+  // Group by batchNum
+  const allBatches=p.batches; // all including deleted
+  const cont=document.getElementById('history-content');
+
+  if(!allBatches.length){
+    cont.innerHTML='<div style="color:var(--text2);text-align:center;padding:20px;">Tarix yo\'q</div>';
+  } else {
+    // Show each batch
+    cont.innerHTML=allBatches.map((b,i)=>{
+      const bNum=i+1;
+      const status=b.deletedAt?'🗑️ O\'chirilgan':'✅ Aktiv';
+      const statusColor=b.deletedAt?'var(--red)':'var(--green)';
+      const days=daysLeft(b.expire);
+      const sc=b.deletedAt?'gray':statusClass(days);
+      // history events for this batch
+      const events=gHistory.filter(h=>h.productName===p.name&&h.category===p.category&&(h.batchNum===bNum||(!h.batchNum&&i===0)));
+      return `
+      <div class="history-partition">
+        <div class="history-partition-header">
+          📦 ${bNum}-partiya
+          <span style="font-size:11px;font-weight:600;color:${statusColor};margin-left:auto;">${status}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;font-size:12px;">
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div style="color:var(--text2);font-size:10px;margin-bottom:2px;">KIRITILGAN</div>
+            <div style="font-weight:700;">${formatDate(b.addedAt)}</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div style="color:var(--text2);font-size:10px;margin-bottom:2px;">TUGASH</div>
+            <div style="font-weight:700;">${formatDate(b.expire)}</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div style="color:var(--text2);font-size:10px;margin-bottom:2px;">MIQDOR</div>
+            <div style="font-weight:700;">${b.qty} ${b.unit}</div>
+          </div>
+          ${b.deletedAt?`<div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div style="color:var(--text2);font-size:10px;margin-bottom:2px;">O'CHIRILGAN</div>
+            <div style="font-weight:700;color:var(--red);">${formatDate(b.deletedAt)}</div>
+          </div>`:''}
+        </div>
+        ${events.length?`
+        <div style="font-size:10px;color:var(--text2);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Harakatlar</div>
+        ${events.map(h=>`
+          <div class="history-item${h.action.includes('o\'chirildi')?` deleted`:''}">
+            <div class="history-item-title">${h.action.includes('o\'chirildi')||h.action.includes('tugadi')?'🗑️':h.action.includes('sotildi')?'💰':'📥'} ${h.action}</div>
+            ${h.addedBy?`<div class="history-item-detail">👤 ${h.addedBy}</div>`:''}
+            <div class="history-item-detail" style="color:var(--accent2);">🕐 ${new Date(h.time).toLocaleString('uz-UZ')}</div>
+          </div>
+        `).join('')}`:''}
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('history-modal').classList.add('open');
+}
+
+// ── Detail ────────────────────────────────────────
+function openDetail(pid,bid) {
+  const p=products.find(x=>x.id===pid);
+  if(!p)return;
+  const b=p.batches.find(x=>x.id===bid);
+  if(!b)return;
+  const days=daysLeft(b.expire);
+  const sc=statusClass(days);
+  const col=sc==='green'?'var(--green)':sc==='yellow'?'var(--yellow)':'var(--red)';
+  document.getElementById('detail-content').innerHTML=`
+    <div class="modal-title">🔍 ${p.name}</div>
+    ${b.img?`<img src="${b.img}" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:12px;">`:''}
+    <div style="display:grid;gap:8px;margin-bottom:14px;">
+      <div style="background:var(--bg);border-radius:10px;padding:11px;">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:3px;">TOIFA</div>
+        <div style="font-weight:700;">${p.category}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--bg);border-radius:10px;padding:11px;">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px;">ISHLAB CHIQARILGAN</div>
+          <div style="font-weight:700;font-size:12px;">${formatDate(b.made)}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:11px;">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px;">TUGASH SANASI</div>
+          <div style="font-weight:700;font-size:12px;">${formatDate(b.expire)}</div>
+        </div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:11px;border-left:4px solid ${col};">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:3px;">HOLAT</div>
+        <div style="font-weight:800;font-size:18px;color:${col};">
+          ${days<0?'Muddati tugagan':days===0?'Bugun tugaydi!':days+' kun qoldi'}
+        </div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:11px;">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:3px;">MIQDOR</div>
+        <div style="font-weight:700;">${b.qty} ${b.unit}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+// ── Expired ───────────────────────────────────────
+function renderExpired() {
+  const cont=document.getElementById('expired-content');
+  const expired=[];
+  products.forEach(p=>{
+    p.batches.filter(b=>!b.deletedAt&&daysLeft(b.expire)<0).forEach(b=>expired.push({p,b}));
+  });
+  if(!expired.length){
+    cont.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Zo\'r!</div><div class="empty-desc">Muddati tugagan mahsulot yo\'q</div></div>';
+    return;
+  }
+  cont.innerHTML=expired.map(({p,b})=>`
+    <div class="expired-card">
+      <div class="expired-img">${b.img?`<img src="${b.img}" alt="">`:'📦'}</div>
+      <div class="expired-info">
+        <div class="expired-name">${p.name}</div>
+        <div class="expired-meta">📅 Tugagan: ${formatDate(b.expire)}</div>
+        <div class="expired-meta">📦 ${b.qty} ${b.unit} · ${p.category}</div>
+      </div>
+      <button class="expired-del" onclick="deleteBatch('${p.id}','${b.id}');renderExpired();">O'chirish</button>
+    </div>
+  `).join('');
+}
+
+// ── Stats ─────────────────────────────────────────
+function updateStats() {
+  let all=0,green=0,yellow=0,red=0,expired=0;
+  products.forEach(p=>p.batches.filter(b=>!b.deletedAt).forEach(b=>{
+    const d=daysLeft(b.expire);
+    if(d<0){expired++;return;}
+    all++;
+    const sc=statusClass(d);
+    if(sc==='green')green++;
+    else if(sc==='yellow')yellow++;
+    else red++;
+  }));
+  document.getElementById('stat-all').textContent=all;
+  document.getElementById('stat-green').textContent=green;
+  document.getElementById('stat-yellow').textContent=yellow;
+  document.getElementById('stat-red').textContent=red;
+  const badge=document.getElementById('expired-badge');
+  if(expired>0){badge.style.display='inline';badge.textContent=expired;}
+  else badge.style.display='none';
+}
+
+// ── Notifications ─────────────────────────────────
+function checkNotifications() {
+  const w=[];
+  products.forEach(p=>p.batches.filter(b=>!b.deletedAt).forEach(b=>{
+    const d=daysLeft(b.expire);
+    if(d>=0&&d<=5)w.push(`${p.name}: ${d===0?'Bugun tugaydi!':d+' kun qoldi'}`);
+  }));
+  if(w.length){
+    document.getElementById('notif-title').textContent=`⚠️ ${w.length} ta mahsulot ogohlantirishi`;
+    document.getElementById('notif-text').textContent=w.slice(0,3).join(' · ')+(w.length>3?` +${w.length-3} ta`:'');
+    const n=document.getElementById('notification');
+    n.classList.add('show');
+    setTimeout(()=>n.classList.remove('show'),6000);
+  }
+}
+
+// ── Profile ───────────────────────────────────────
+function getFullName(){
+  const f=profile.firstname||'';
+  const l=profile.lastname||'';
+  return (f+' '+l).trim()||'Noma\'lum';
+}
+
+function loadProfile() {
+  document.getElementById('s-firstname').value=profile.firstname||'';
+  document.getElementById('s-lastname').value=profile.lastname||'';
+  document.getElementById('s-shopname').value=profile.shopname||'';
+  updateProfileDisplay();
+}
+
+function saveProfile() {
+  profile.firstname=document.getElementById('s-firstname').value.trim();
+  profile.lastname=document.getElementById('s-lastname').value.trim();
+  profile.shopname=document.getElementById('s-shopname').value.trim();
+  save();
+  updateProfileDisplay();
+}
+
+function updateProfileDisplay() {
+  const name=getFullName();
+  const shop=profile.shopname||'Do\'kon xodimi';
+  document.getElementById('profile-name-display').textContent=name;
+  document.getElementById('profile-role-display').textContent=shop;
+  // header avatar
+  const ha=document.getElementById('header-avatar');
+  const sa=document.getElementById('settings-avatar');
+  if(profile.avatar){
+    ha.innerHTML=`<img src="${profile.avatar}" alt="">`;
+    sa.innerHTML=`<img src="${profile.avatar}" alt="">`;
+  } else {
+    ha.textContent='👤';
+    sa.textContent='👤';
+  }
+}
+
+function handleAvatar(e) {
+  const file=e.target.files[0];
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    profile.avatar=ev.target.result;
+    save();
+    updateProfileDisplay();
+  };
+  r.readAsDataURL(file);
+}
+
+// ── Settings Render ───────────────────────────────
+function renderSettings() {
+  loadProfile();
+  // Theme toggle
+  const tog=document.getElementById('theme-toggle');
+  if(tog)tog.classList.toggle('on',isDark);
+  // Categories manage
+  const list=document.getElementById('cat-manage-list');
+  list.innerHTML=categories.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:600;">${c}</div>
+      <button onclick="deleteCat(${i})" style="background:var(--red-bg);border:1px solid var(--red);color:var(--red);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;">✕</button>
+    </div>
+  `).join('');
+}
+
+function deleteCat(i) {
+  if(!confirm(`"${categories[i]}" toifasini o'chirasizmi?`))return;
+  categories.splice(i,1);
+  save();
+  renderSettings();
+}
+
+function addNewCategory() {
+  const v=document.getElementById('new-cat-input').value.trim();
+  if(!v)return;
+  if(!categories.includes(v)){categories.push(v);save();}
+  document.getElementById('new-cat-input').value='';
+  renderSettings();
+}
+
+function exportData() {
+  const data={products,categories,history:gHistory,profile:{...profile,avatar:'[avatar]'},exportedAt:nowStr()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`muddatlar_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function clearAllData() {
+  if(!confirm('Barcha ma\'lumotlarni o\'chirmoqchimisiz? Bu amalni qaytarib bo\'lmaydi!'))return;
+  if(!confirm('Ishonchingiz komilmi?'))return;
+  products=[]; gHistory=[];
+  save();
+  renderCategoryTiles();
+  updateStats();
+  alert('Barcha ma\'lumotlar tozalandi.');
+}
+
+// ── Modal ─────────────────────────────────────────
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── Init ──────────────────────────────────────────
+applyTheme();
+renderCategoryTiles();
+updateStats();
+checkNotifications();
+loadProfile();
+</script>
+</body>
+</html>
